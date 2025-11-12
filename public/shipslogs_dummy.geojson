@@ -4,76 +4,410 @@
     {
       "type": "Feature",
       "geometry": {
-        "type": "Point",
-        "coordinates": [-58.2, 38.52] 
+        "type": "LineString",
+        "coordinates": [
+          [
+            -58.2,
+            38.52
+          ],
+          [
+            -46.31,
+            37.48
+          ],
+          [
+            -45.2,
+            38.14
+          ],
+          [
+            -62.4,
+            54.0
+          ],
+          [
+            -73.45,
+            35.2
+          ]
+        ]
       },
       "properties": {
+        "log_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
         "ship_name": "Albion",
-        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
+        "voyage_start": "1854-11-08",
+        "voyage_end": "1855-04-28",
+        "destination": "Pacific Ocean",
+        "master": "J. F. Hinds",
+        "total_entries": 14,
+        "entries_with_coords": 5,
+        "feature_type": "route"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -58.2,
+          38.52
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
+        "ship_name": "Albion",
         "date": "1854-11-15",
-        "weather": "Brisk wind from Southward & Eastward",
-        "remarks": "Passed a bark on the opposite tack.",
-        "events": "[]"
+        "weather": "Brisk wind",
+        "remarks": "Passed a bark on the opposite tack, set up the Main Topmast & Top gallant rigging & backstays",
+        "events": [],
+        "feature_type": "point"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-46.31, 37.48]
+        "coordinates": [
+          -46.31,
+          37.48
+        ]
       },
       "properties": {
+        "log_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
         "ship_name": "Albion",
-        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
         "date": "1854-11-19",
-        "weather": "Brisk wind from W.N.W.",
-        "remarks": "Running S.E.",
-        "events": "[]"
+        "weather": "Brisk wind",
+        "remarks": "Made all sail, saw nothing",
+        "events": [],
+        "feature_type": "point"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-45.2, 38.14]
+        "coordinates": [
+          -45.2,
+          38.14
+        ]
       },
       "properties": {
+        "log_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
         "ship_name": "Albion",
-        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
         "date": "1854-11-20",
-        "weather": "Light airs and heavy swell.",
-        "remarks": "Lowered all 4 boats for exercise.",
-        "events": "Saw a Finback"
+        "weather": "Light airs",
+        "remarks": "Lowered all 4 boats for exercise, saw a Finback",
+        "events": [
+          "Saw a Finback"
+        ],
+        "feature_type": "point"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-24.17, 25.34]
+        "coordinates": [
+          -62.4,
+          54.0
+        ]
       },
       "properties": {
+        "log_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
         "ship_name": "Albion",
-        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
-        "date": "1855-01-01",
-        "weather": "Fine & pleasant weather",
+        "date": "1855-01-26",
+        "weather": "Fresh gales",
         "remarks": "Running S.S.W.",
-        "events": "[]"
+        "events": [],
+        "feature_type": "point"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-78.21, 53.37]
+        "coordinates": [
+          -73.45,
+          35.2
+        ]
       },
       "properties": {
+        "log_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
         "ship_name": "Albion",
-        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
-        "date": "1855-02-20",
-        "weather": "Strong winds from Westward",
-        "remarks": "Lying on the S.W. tack.",
-        "events": "[]"
+        "date": "1855-03-15",
+        "weather": "Sea account",
+        "remarks": "Got under weigh with fresh breezes, running NW by N.",
+        "events": [],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -178.34,
+            -30.24
+          ],
+          [
+            -178.6,
+            -29.56
+          ],
+          [
+            -178.4,
+            -29.59
+          ],
+          [
+            -179.1,
+            -30.24
+          ],
+          [
+            -179.35,
+            -30.23
+          ],
+          [
+            -179.55,
+            -29.45
+          ],
+          [
+            -179.1,
+            -30.19
+          ],
+          [
+            -179.1,
+            -30.16
+          ],
+          [
+            -178.59,
+            -30.2
+          ],
+          [
+            -166.14,
+            -36.59
+          ]
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "voyage_start": "1880-03-24",
+        "voyage_end": "1880-10-16",
+        "destination": "Vasquez Grounds",
+        "master": "C. Grant",
+        "total_entries": 10,
+        "entries_with_coords": 10,
+        "feature_type": "route"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -178.34,
+          -30.24
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-03-24",
+        "weather": "Strong breezes from WSW",
+        "remarks": "Steering WNW under Short Sail. Macauley Island in sight.",
+        "events": [
+          "2 Sails in sight"
+        ],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -178.6,
+          -29.56
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-03-25",
+        "weather": "Calms",
+        "remarks": "Macauley Island & Curtis Rocks in sight.",
+        "events": [],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -178.4,
+          -29.59
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-03-26",
+        "weather": "Light breezes from the SE",
+        "remarks": "Spoke with Ship California and Bark Canton.",
+        "events": [
+          "Ship California 40 Months out 2300 bbls",
+          "Bark Canton Capt J Sherman 18 Months out 725 bbls"
+        ],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -179.1,
+          -30.24
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-03-27",
+        "weather": "Calms, light Breezes from the SE",
+        "remarks": "Goat Island bearing East.",
+        "events": [
+          "1 Sail In Sight"
+        ],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -179.35,
+          -30.23
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-03-28",
+        "weather": "Light breezes from South",
+        "remarks": "Steering WSW under all Sail. Saw Sperm Whale.",
+        "events": [
+          "Saw Sperm Whale 4 Miles to the SW",
+          "2 Sails In Sight"
+        ],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -179.55,
+          -29.45
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-03-29",
+        "weather": "Moderate breezes from SW",
+        "remarks": "Down boats for Sperm whales & Chased until Night. Struck & killed 40 bbls.",
+        "events": [
+          "Saw Sperm Whales 1 mile to the SW & heading to the SE",
+          "Mated With Ship California"
+        ],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -179.1,
+          -30.19
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-03-30",
+        "weather": "Moderate breezes from the South",
+        "remarks": "Took one whale alongside, commenced cutting.",
+        "events": [
+          "Finished Cutting and Made Sail to the SW",
+          "Commence boiling at 10"
+        ],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -179.1,
+          -30.16
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-03-31",
+        "weather": "Light breezes from the SE",
+        "remarks": "Finished boiling 33 bbls. Saw Sperm whales to the South & bound to the NE.",
+        "events": [
+          "Saw Sperm whales 4 Miles to the South & bound to the NE",
+          "Goat Island in sight"
+        ],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -178.59,
+          -30.2
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-04-01",
+        "weather": "Strong breezes from the ESE",
+        "remarks": "Wore Ship and Commenced Cutting. Employed boiling.",
+        "events": [
+          "Ship California in sight",
+          "Maclaus Island in Sight"
+        ],
+        "feature_type": "point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -166.14,
+          -36.59
+        ]
+      },
+      "properties": {
+        "log_id": "6000_511_m3868_ms220_log108-transcript.pdfplu_p1i3difuuuosd4kcpcn19mtbgd4.pdf",
+        "ship_name": "Horatio",
+        "date": "1880-10-16",
+        "weather": "Moderate breezes from West",
+        "remarks": "Commenced boiling fine weather.",
+        "events": [
+          "Killed one whale at 3pm took him alongside and commenced cutting at 9 pm"
+        ],
+        "feature_type": "point"
       }
     }
   ]
