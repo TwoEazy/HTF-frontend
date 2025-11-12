@@ -205,9 +205,9 @@ this.$emit('data-loaded', shipList);
               layout: { 'line-join': 'round', 'line-cap': 'round' },
               paint: {
                 'line-color': dynamicColorExpression,
-                'line-width': 6,
+                'line-width': 3,
                 'line-opacity': 0.9,
-                'line-dasharray': [3, 2]
+                'line-dasharray': [1, 1.5]
               }
             });
           }
