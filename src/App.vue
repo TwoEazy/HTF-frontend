@@ -7,8 +7,8 @@
     <button
       @click="
         location = {
-          center: { lng: 4.4235414 , lat: 51.2163428 },
-          zoom: 14,
+          center: {  lng: -10.0, lat: 35.0 },
+          zoom: 4,
         }
       "
     >
@@ -30,8 +30,8 @@ export default {
   data() {
     return {
       location: {
-        center: { lng: 4.4235414 , lat: 51.2163428 },
-        zoom: 14,
+        center: { lng: -10.0, lat: 35.0 },
+        zoom: 4,
       },
     };
   },

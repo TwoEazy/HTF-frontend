@@ -1,0 +1,91 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.35, 48.85] 
+      },
+      "properties": {
+        "date": "1830-05-01",
+        "ship_name": "De Zeefakkel",
+        "weather": "Rustig, Lichte mist",
+        "events": ["Vertrek uit haven"],
+        "voyage_id": "ZF-1830-A"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-15.45, 32.70] 
+      },
+      "properties": {
+        "date": "1830-05-10",
+        "ship_name": "De Zeefakkel",
+        "weather": "Zonnig, sterke wind",
+        "events": ["Geen"],
+        "voyage_id": "ZF-1830-A"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-28.10, 20.00] 
+      },
+      "properties": {
+        "date": "1830-05-20",
+        "ship_name": "De Zeefakkel",
+        "weather": "Stormachtig, hoge golven",
+        "events": ["Walvis gespot", "Schade aan mast"],
+        "voyage_id": "ZF-1830-A"
+      }
+    },
+    
+    
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.50, 50.15] 
+      },
+      "properties": {
+        "date": "1840-09-05",
+        "ship_name": "De Walvisvaarder",
+        "weather": "Klaar, kalme zee",
+        "events": ["Vertrokken uit Engeland"],
+        "voyage_id": "WV-1840-B"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-12.80, 42.00] 
+      },
+      "properties": {
+        "date": "1840-09-15",
+        "ship_name": "De Walvisvaarder",
+        "weather": "Zwaar, harde tegenwind",
+        "events": ["Verlies van anker"],
+        "voyage_id": "WV-1840-B"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-20.00, 39.50] 
+      },
+      "properties": {
+        "date": "1840-09-25",
+        "ship_name": "De Walvisvaarder",
+        "weather": "Lichte regen",
+        "events": ["Grote walvis gevangen (1e van de reis)"],
+        "voyage_id": "WV-1840-B"
+      }
+    }
+  ]
+}
