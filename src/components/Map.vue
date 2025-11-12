@@ -16,8 +16,21 @@ export default {
 
   data(){
     return{
-        geojsonUrl: "/shipslogs_dummy.geojson",
+        geojsonUrl: "/shipslogs_dummy.geojson"
     };
+  },
+  computed: {
+    displayPosition() {
+      const log = this.selectedLog;
+      
+      // Controleer of de log bestaat en de coördinaten numeriek zijn
+      if (log && typeof log.longitude === 'number' && typeof log.latitude === 'number') {
+        // Formatteer de coördinaten als string
+        return `${log.longitude.toFixed(2)}, ${log.latitude.toFixed(2)}`;
+      } 
+      // Fallback voor ongedefinieerde/null coördinaten
+      return 'Niet geregistreerd (bijv. aan land/haven)';
+    }
   },
 
   mounted() {
@@ -26,7 +39,7 @@ export default {
     // instantiate the map using the center and zoom from the modelValue prop
     const map = new mapboxgl.Map({
       container: this.$refs.mapContainer,
-      style: "mapbox://styles/saraamelia/cmhvvt5uq000q01s98mrh4gt3",
+      style: "mapbox://styles/saraamelia/cmhvxq5ik000z01qx982c29gn",
       center: center,
       zoom,
     });
@@ -41,21 +54,6 @@ export default {
 
     this.map = map;
 
-    // CHANGES BEFORE DUMMY GEOJSON DATA
-
-    /* 
-        // function to update the modelValue prop with the map's current location
-        const updateLocation = () =>
-        this.$emit("update:modelValue", this.getLocation());
-
-        // add event listeners to update the location on map move and zoom
-        map.on("move", updateLocation);
-        map.on("zoom", updateLocation);
-
-        // assign the map instance to this component's map property
-        this.map = map;
-
-    */
   },
 
   // clean up the map instance when the component is unmounted
@@ -100,18 +98,56 @@ export default {
         //}
         //const data = await response.json();
 
-        const data = this.geojsonUrl; // Using local dummy data path for now
 
-        const transformedData = data;//this.processRawDataToGeoJson(data);
+        //Convert data to Json!
+        const response = await fetch(this.geojsonUrl);// Using local dummy data path for now
+        const dataJson = await response.json();
+
+        const data = dataJson; 
+
+        const routeLines = this.generateRoutes(data.features);
 
         // 2. Add Source 
-        this.map.addSource('ship-log-source', {
+        this.map.addSource('ship-routes-source', {
           type: 'geojson',
-          data: transformedData // GeoJSON FeatureCollection
+          data: routeLines // GeoJSON FeatureCollection
         });
 
         // 3. Add layer
-        this.map.addLayer({
+        this.map.addLayer(
+        {
+            id: 'ship-routes-lines',
+            type: 'line',
+            source: 'ship-routes-source',
+            'minzoom': 2,
+            layout: {
+                'line-join': 'round',
+                'line-cap': 'round'
+            },
+            paint: {
+                'line-color': [
+                    'match',
+                    ['get', 'ship_name'],
+                    'Albion', '#A08060',      // Oud brons/bruin
+                    'De Zeefakkel', '#708090', // Oud staal/grijsblauw
+                    '#B0C4DE'                 // Licht staalblauw voor andere schepen
+                ],
+                
+                'line-width': 6, 
+                
+                'line-opacity': 0.9, 
+            
+                'line-dasharray': [3, 2], // [lengte van streep, lengte van spatie]
+            }
+        });
+        
+        this.map.addSource('ship-log-source', {
+            type: 'geojson',
+            data: data
+        });
+
+    this.map.addLayer(
+        {
           id: 'ship-log-points',
           type: 'circle',
           source: 'ship-log-source', // Reference to map source
@@ -125,10 +161,12 @@ export default {
                 '#ccc'
             ],
             'circle-radius': 8,
-            'circle-stroke-width': 2,
+            'circle-stroke-width': 8,
             'circle-stroke-color': '#fff'
           }
-        });
+        },
+        
+    );
 
         //Interactivtity: mousehovers and popups
         this.addMapInteractivity();
@@ -140,22 +178,22 @@ export default {
 
     addMapInteractivity() {
         this.map.on('click', 'ship-log-points', (e) => {
-            const properties = e.features[0].properties;
-
-            const eventsList = Array.isArray(properties.events) ? properties.events.join(', ') : properties.events;
-
-            const popupHTML = `
-              <h3>${properties.ship_name} (${properties.date})</h3>
-              <strong>Locatie:</strong> ${e.lngLat.lng.toFixed(2)}, ${e.lngLat.lat.toFixed(2)}<br>
-              <strong>Weer:</strong> ${properties.weather}<br>
-              <strong>Gebeurtenissen:</strong> ${eventsList || 'Geen bijzondere gebeurtenissen'}
-            `;
-
-            new mapboxgl.Popup()
-              .setLngLat(e.lngLat)
-              .setHTML(popupHTML)
-              .addTo(this.map);
+        const clickedFeature = e.features[0];
+        
+        // ZEND HET EVENT UIT: 'open-sidebar' met de feature properties
+        this.$emit('open-sidebar', {
+            ...clickedFeature.properties,
+            longitude: clickedFeature.geometry.coordinates[0], 
+            latitude: clickedFeature.geometry.coordinates[1]
         });
+
+        // Optioneel: centreer de kaart op het geklikte punt
+        this.map.flyTo({
+            center: clickedFeature.geometry.coordinates,
+            speed: 0.5,
+            essential: true
+        });
+    });
         
         // Change cursor at hover
         this.map.on('mouseenter', 'ship-log-points', () => {
@@ -166,74 +204,52 @@ export default {
         });
     },
 
-    processRawDataToGeoJson(rawData) {
-    const allFeatures = [];
-    
+    // Generate routes
+    generateRoutes(pointFeatures){
+        const routes = {};
 
-    console.log( typeof rawData );
+        //Group and sort points
+        pointFeatures.forEach(feature => {
+            const log_id = feature.properties.log_id;
+            if (!routes[log_id]) {
+                routes[log_id] = [];
+            }
+            routes[log_id].push(feature);
+        });
 
-    if (!Array.isArray(rawData)) {
-        console.error("Fout: Invoer data is geen array. Kan niet verwerken.");
-        return { type: "FeatureCollection", features: [] };
-    }
+        const routeFeatures = [];
+        for (const log_id in routes) {
+        // Sorteer punten op datum (van oud naar nieuw)
+        routes[log_id].sort((a, b) => new Date(a.properties.date) - new Date(b.properties.date));
 
-    // Loop door elk schip in de array
-    rawData.forEach(shipData => {
-        
-        // Log om te controleren of het schip is geladen
-        console.log(`Verwerking gestart voor schip: ${shipData.ship_name}`);
-        
-        // Controleer of de entries array bestaat
-        if (Array.isArray(shipData.entries)) {
-            
-            // Loop door elke dagelijkse logboekvermelding
-            shipData.entries.forEach(entry => {
-                
-                // Filter: alleen punten met geldige (niet-null) coördinaten
-                if (entry.latitude !== null && entry.longitude !== null && entry.longitude !== undefined) {
-                    
-                    // Log de geldige coördinaten
-                    console.log(`  -> Punt gevonden: ${entry.date}, Lng: ${entry.longitude}, Lat: ${entry.latitude}`);
+        // Extraheer de gesorteerde coördinaten
+        const coordinates = routes[log_id].map(f => f.geometry.coordinates);
 
-                    allFeatures.push({
-                        "type": "Feature",
-                        "geometry": {
-                            // BELANGRIJK: GeoJSON/Mapbox gebruikt [Longitude, Latitude]
-                            "type": "Point",
-                            "coordinates": [entry.longitude, entry.latitude] 
-                        },
-                        "properties": {
-                            // Algemene schip/reis metadata
-                            "ship_name": shipData.ship_name,
-                            "voyage_id": shipData.log_id,
-                            "master": shipData.master,
-                            "destination": shipData.destination,
-                            
-                            // Dagelijkse entry properties
-                            "date": entry.date,
-                            "weather": entry.weather,
-                            "remarks": entry.remarks,
-                            
-                            // Converteer de 'events' array naar een bruikbare string voor de popup
-                            "events": Array.isArray(entry.events) ? entry.events.join('; ') : entry.events
-                        }
-                    });
-                } else {
-                    console.log(`  -> Overgeslagen: ${entry.date} heeft ongeldige of missende coördinaten.`);
+        // 2. Maak de LineString Feature
+        if (coordinates.length > 1) { 
+            // Vroegste en laatste datum (voor pop-ups op de lijn)
+            const startDate = routes[log_id][0].properties.date;
+            const endDate = routes[log_id][routes[log_id].length - 1].properties.date;
+
+            routeFeatures.push({
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: coordinates
+                },
+                properties: {
+                    ship_name: routes[log_id][0].properties.ship_name,
+                    voyage_id: log_id,
+                    period: `${startDate} tot ${endDate}`
                 }
             });
-        } else {
-             console.warn(`Waarschuwing: Schip ${shipData.ship_name} mist de 'entries' array of deze is ongeldig.`);
         }
-    });
-
-        // Het finale resultaat
-        console.log(`Transformatie voltooid. Totaal ${allFeatures.length} punten gegenereerd.`);
-        return {
-            "type": "FeatureCollection",
-            "features": allFeatures
-        };
-    },
+    }
+    return {
+        type: 'FeatureCollection',
+        features: routeFeatures
+    };
+    }
   },
 };
 
