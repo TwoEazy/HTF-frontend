@@ -40,6 +40,22 @@
     </div>
 
     <MapView ref="mapRef" v-model="location" @open-sidebar="openSidebarWithData" @ships-loaded="onShipsLoaded" />
+
+    <!-- Left menu for ships -->
+    <div id="left-menu" :class="{ open: menuOpen }" @mouseenter="menuOpen = true" @mouseleave="menuOpen = false">
+      <button class="menu-toggle" @click="menuOpen = !menuOpen">☰ Ships</button>
+      <div class="menu-list">
+        <div v-if="ships && ships.length">
+          <div v-for="(s, idx) in ships" :key="s.log_id || s.ship_name || idx" class="ship-item">
+            <button class="ship-btn" @click="goToShip(s)">
+              <div class="ship-name">{{ s.ship_name }}</div>
+              <div class="ship-meta">{{ s.startDate ? (new Date(s.startDate)).toLocaleDateString() : '' }}</div>
+            </button>
+          </div>
+        </div>
+        <div v-else class="empty">No ships loaded</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -225,4 +241,35 @@ export default {
   border: none;
   cursor: pointer;
 }
+
+/* Left ship menu */
+#left-menu {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: 220px;
+  max-height: calc(100% - 24px);
+  background: rgba(255,255,255,0.95);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  overflow: hidden;
+  z-index: 3;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+#left-menu .menu-toggle {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  background: #1f2937;
+  color: #fff;
+  cursor: pointer;
+}
+#left-menu .menu-list { padding: 8px; max-height: 60vh; overflow-y: auto; }
+.ship-item { margin-bottom: 6px; }
+.ship-btn { width: 100%; display:flex; justify-content:space-between; align-items:center; padding:8px; border-radius:4px; border:1px solid #eee; background:#fff; cursor:pointer; }
+.ship-btn:hover { background:#f6f6f6 }
+.ship-name { font-weight:600 }
+.ship-meta { font-size:12px; color:#666 }
+.empty { padding:8px; color:#666 }
 </style>
