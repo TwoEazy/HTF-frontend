@@ -5,86 +5,75 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [2.35, 48.85] 
+        "coordinates": [-58.2, 38.52] 
       },
       "properties": {
-        "date": "1830-05-01",
-        "ship_name": "De Zeefakkel",
-        "weather": "Rustig, Lichte mist",
-        "events": ["Vertrek uit haven"],
-        "voyage_id": "ZF-1830-A"
+        "ship_name": "Albion",
+        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
+        "date": "1854-11-15",
+        "weather": "Brisk wind from Southward & Eastward",
+        "remarks": "Passed a bark on the opposite tack.",
+        "events": "[]"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-15.45, 32.70] 
+        "coordinates": [-46.31, 37.48]
       },
       "properties": {
-        "date": "1830-05-10",
-        "ship_name": "De Zeefakkel",
-        "weather": "Zonnig, sterke wind",
-        "events": ["Geen"],
-        "voyage_id": "ZF-1830-A"
+        "ship_name": "Albion",
+        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
+        "date": "1854-11-19",
+        "weather": "Brisk wind from W.N.W.",
+        "remarks": "Running S.E.",
+        "events": "[]"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-28.10, 20.00] 
+        "coordinates": [-45.2, 38.14]
       },
       "properties": {
-        "date": "1830-05-20",
-        "ship_name": "De Zeefakkel",
-        "weather": "Stormachtig, hoge golven",
-        "events": ["Walvis gespot", "Schade aan mast"],
-        "voyage_id": "ZF-1830-A"
-      }
-    },
-    
-    
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [-4.50, 50.15] 
-      },
-      "properties": {
-        "date": "1840-09-05",
-        "ship_name": "De Walvisvaarder",
-        "weather": "Klaar, kalme zee",
-        "events": ["Vertrokken uit Engeland"],
-        "voyage_id": "WV-1840-B"
+        "ship_name": "Albion",
+        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
+        "date": "1854-11-20",
+        "weather": "Light airs and heavy swell.",
+        "remarks": "Lowered all 4 boats for exercise.",
+        "events": "Saw a Finback"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-12.80, 42.00] 
+        "coordinates": [-24.17, 25.34]
       },
       "properties": {
-        "date": "1840-09-15",
-        "ship_name": "De Walvisvaarder",
-        "weather": "Zwaar, harde tegenwind",
-        "events": ["Verlies van anker"],
-        "voyage_id": "WV-1840-B"
+        "ship_name": "Albion",
+        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
+        "date": "1855-01-01",
+        "weather": "Fine & pleasant weather",
+        "remarks": "Running S.S.W.",
+        "events": "[]"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-20.00, 39.50] 
+        "coordinates": [-78.21, 53.37]
       },
       "properties": {
-        "date": "1840-09-25",
-        "ship_name": "De Walvisvaarder",
-        "weather": "Lichte regen",
-        "events": ["Grote walvis gevangen (1e van de reis)"],
-        "voyage_id": "WV-1840-B"
+        "ship_name": "Albion",
+        "voyage_id": "6000_511_m3746_ms220_log2-transcript.pdfplu_p1fi2qji3u14ia1btk1hts1u7g1ati4.pdf",
+        "date": "1855-02-20",
+        "weather": "Strong winds from Westward",
+        "remarks": "Lying on the S.W. tack.",
+        "events": "[]"
       }
     }
   ]

@@ -26,7 +26,7 @@ export default {
     // instantiate the map using the center and zoom from the modelValue prop
     const map = new mapboxgl.Map({
       container: this.$refs.mapContainer,
-      style: "mapbox://styles/mapbox/standard",
+      style: "mapbox://styles/saraamelia/cmhvvt5uq000q01s98mrh4gt3",
       center: center,
       zoom,
     });
@@ -93,8 +93,6 @@ export default {
 
     async addGeoJsonLayer() {
       try {
-        console.log('Map loaded from:', this.geojsonUrl);
-
         // 1. Load data - API call to fetch GeoJSON
         //const response = await fetch(this.geojsonUrl);
         //if (!response.ok) {
@@ -104,10 +102,12 @@ export default {
 
         const data = this.geojsonUrl; // Using local dummy data path for now
 
+        const transformedData = data;//this.processRawDataToGeoJson(data);
+
         // 2. Add Source 
         this.map.addSource('ship-log-source', {
           type: 'geojson',
-          data: data // GeoJSON FeatureCollection
+          data: transformedData // GeoJSON FeatureCollection
         });
 
         // 3. Add layer
@@ -164,13 +164,82 @@ export default {
         this.map.on('mouseleave', 'ship-log-points', () => {
             this.map.getCanvas().style.cursor = '';
         });
+    },
+
+    processRawDataToGeoJson(rawData) {
+    const allFeatures = [];
+    
+
+    console.log( typeof rawData );
+
+    if (!Array.isArray(rawData)) {
+        console.error("Fout: Invoer data is geen array. Kan niet verwerken.");
+        return { type: "FeatureCollection", features: [] };
     }
+
+    // Loop door elk schip in de array
+    rawData.forEach(shipData => {
+        
+        // Log om te controleren of het schip is geladen
+        console.log(`Verwerking gestart voor schip: ${shipData.ship_name}`);
+        
+        // Controleer of de entries array bestaat
+        if (Array.isArray(shipData.entries)) {
+            
+            // Loop door elke dagelijkse logboekvermelding
+            shipData.entries.forEach(entry => {
+                
+                // Filter: alleen punten met geldige (niet-null) coördinaten
+                if (entry.latitude !== null && entry.longitude !== null && entry.longitude !== undefined) {
+                    
+                    // Log de geldige coördinaten
+                    console.log(`  -> Punt gevonden: ${entry.date}, Lng: ${entry.longitude}, Lat: ${entry.latitude}`);
+
+                    allFeatures.push({
+                        "type": "Feature",
+                        "geometry": {
+                            // BELANGRIJK: GeoJSON/Mapbox gebruikt [Longitude, Latitude]
+                            "type": "Point",
+                            "coordinates": [entry.longitude, entry.latitude] 
+                        },
+                        "properties": {
+                            // Algemene schip/reis metadata
+                            "ship_name": shipData.ship_name,
+                            "voyage_id": shipData.log_id,
+                            "master": shipData.master,
+                            "destination": shipData.destination,
+                            
+                            // Dagelijkse entry properties
+                            "date": entry.date,
+                            "weather": entry.weather,
+                            "remarks": entry.remarks,
+                            
+                            // Converteer de 'events' array naar een bruikbare string voor de popup
+                            "events": Array.isArray(entry.events) ? entry.events.join('; ') : entry.events
+                        }
+                    });
+                } else {
+                    console.log(`  -> Overgeslagen: ${entry.date} heeft ongeldige of missende coördinaten.`);
+                }
+            });
+        } else {
+             console.warn(`Waarschuwing: Schip ${shipData.ship_name} mist de 'entries' array of deze is ongeldig.`);
+        }
+    });
+
+        // Het finale resultaat
+        console.log(`Transformatie voltooid. Totaal ${allFeatures.length} punten gegenereerd.`);
+        return {
+            "type": "FeatureCollection",
+            "features": allFeatures
+        };
+    },
   },
 };
+
 </script>
 
 <style>
-/* make the map container fill its parent */
 .map-container {
   width: 100%;
   height: 100%;
