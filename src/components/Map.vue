@@ -186,6 +186,40 @@ generateColorExpression(colorMap) {
 const dynamicColorExpression = this.generateColorExpression(colorMap);
 this.$emit('data-loaded', shipList);
 
+        // Build ships list with earliest (start) point per voyage/log
+        const shipsMap = {};
+        geojson.features.forEach(f => {
+          const props = f.properties || {};
+          const id = props.log_id || props.voyage_id || props.ship_name || 'unknown';
+          const date = props.date ? new Date(props.date) : null;
+          if (!shipsMap[id]) shipsMap[id] = { ship_name: props.ship_name || 'unknown', log_id: props.log_id || null, startFeature: null, startDate: null };
+          const current = shipsMap[id];
+          if (!current.startFeature) {
+            current.startFeature = f;
+            current.startDate = date;
+          } else if (date && current.startDate && date < current.startDate) {
+            current.startFeature = f;
+            current.startDate = date;
+          } else if (date && !current.startDate) {
+            current.startFeature = f;
+            current.startDate = date;
+          }
+        });
+
+        const shipsList = Object.keys(shipsMap).map(k => {
+          const s = shipsMap[k];
+          const coords = s.startFeature ? s.startFeature.geometry.coordinates : null;
+          return {
+            ship_name: s.ship_name,
+            log_id: s.log_id,
+            start: coords,
+            startDate: s.startDate ? s.startDate.toISOString() : null
+          };
+        });
+
+        // Emit ships list so parent can build a menu
+        this.$emit('ships-loaded', shipsList);
+
         // Add or update ship-routes-source
         if (this.map.getSource('ship-routes-source')) {
           this.map.getSource('ship-routes-source').setData(routeLines);
@@ -237,6 +271,9 @@ this.$emit('data-loaded', shipList);
 
         //Interactivtity: mousehovers and popups
         this.addMapInteractivity();
+
+  // expose geojson on component instance for debugging if needed
+  this._latestGeojson = geojson;
 
       } catch (error) {
         console.error("Issue loading GEOJson:", error);
@@ -311,6 +348,13 @@ this.$emit('data-loaded', shipList);
         this.map.on('mouseleave', 'ship-log-points', () => {
             this.map.getCanvas().style.cursor = '';
         });
+    },
+
+    // Allow parent to instruct map to fly to a given [lng, lat]
+    flyToLocation(coords, opts = {}) {
+      if (!this.map || !coords || coords.length < 2) return;
+      const [lng, lat] = coords;
+      this.map.flyTo(Object.assign({ center: [lng, lat], zoom: opts.zoom ?? 8, speed: 0.8, essential: true }, opts));
     },
 
     // Generate routes
