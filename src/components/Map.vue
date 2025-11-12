@@ -89,6 +89,48 @@ export default {
       };
     },
 
+    getHistoricColorPalette() {
+    return [
+   '#FF4500', // Orange Red (Zeer Helder Oranje-Rood)
+        '#00BFFF', // Deep Sky Blue (Levendig, Helder Blauw)
+        '#32CD32', // Lime Green (Fel Groen)
+        '#FFD700', // Gold (Klassiek Helder Goud)
+        '#FF1493', // Deep Pink (Opvallend Roze)
+        '#8A2BE2', // Blue Violet (Intens Paars)
+        '#1E90FF'  // Dodger Blue (Briljant Blauw)
+    ];
+},
+createColorMapping(shipList) {
+    const palette = this.getHistoricColorPalette();
+    const colorMap = {};
+    
+    shipList.forEach((ship, index) => {
+        // Gebruik de modulo operator (%) om door het palet te loopen als er meer schepen zijn dan kleuren
+        const color = palette[index % palette.length];
+        colorMap[ship.name] = color;
+    });
+    
+    return colorMap;
+},
+generateColorExpression(colorMap) {
+    // Start met de basis van de Mapbox match expressie
+    let expression = [
+        'match', 
+        ['get', 'ship_name'] // De property om te matchen
+    ];
+
+    // Voeg voor elk schip de naam en de kleur toe
+    for (const name in colorMap) {
+        expression.push(name, colorMap[name]);
+    }
+
+    // Voeg de fallback kleur toe voor niet-gematched schepen
+    expression.push('#696969'); // Donkergrijs als fallback
+
+    return expression;
+},
+
+
     async addGeoJsonLayer() {
       try {
         // 1. Load data - API call to fetch GeoJSON or API-structured JSON
@@ -139,6 +181,10 @@ export default {
 
         // Generate route lines from point features
         const routeLines = this.generateRoutes(geojson.features);
+        let shipList = this.extractShipList(geojson.features);
+        const colorMap = this.createColorMapping(shipList);
+const dynamicColorExpression = this.generateColorExpression(colorMap);
+this.$emit('data-loaded', shipList);
 
         // Add or update ship-routes-source
         if (this.map.getSource('ship-routes-source')) {
@@ -158,15 +204,10 @@ export default {
               minzoom: 2,
               layout: { 'line-join': 'round', 'line-cap': 'round' },
               paint: {
-                'line-color': [
-                  'match', ['get', 'ship_name'],
-                  'Albion', '#A08060',
-                  'De Zeefakkel', '#708090',
-                  '#B0C4DE'
-                ],
-                'line-width': 6,
+                'line-color': dynamicColorExpression,
+                'line-width': 3,
                 'line-opacity': 0.9,
-                'line-dasharray': [3, 2]
+                'line-dasharray': [1, 1.5]
               }
             });
           }
@@ -184,15 +225,11 @@ export default {
               type: 'circle',
               source: 'ship-log-source',
               paint: {
-                'circle-color': [
-                  'match', ['get', 'ship_name'],
-                  'De Zeefakkel', '#007bff',
-                  'De Walvisvaarder', '#dc3545',
-                  '#ccc'
-                ],
-                'circle-radius': 8,
-                'circle-stroke-width': 8,
-                'circle-stroke-color': '#fff'
+                'circle-radius': 6, 
+        'circle-color': dynamicColorExpression, // <-- GEBRUIK DE DYNAMISCHE EXPRESSIE
+        'circle-stroke-width': 1.5,
+        'circle-stroke-color': '#F0E6D0',
+        'circle-opacity': 0.8
               }
             });
           }
@@ -205,6 +242,49 @@ export default {
         console.error("Issue loading GEOJson:", error);
       }
     },
+
+    extractShipList(features) {
+        console.log(features);
+    const shipMap = {};
+
+    // 1. Groepeer Features en bepaal de vroegste logboekdatum
+    features.forEach(feature => {
+        const properties = feature.properties;
+        const coordinates = feature.geometry.coordinates;
+        
+        // Gebruik voyage_id als unieke sleutel
+        const log_id = properties.log_id; 
+        
+    
+        const currentDate = properties.date; 
+
+        if (!shipMap[log_id]) {
+            // Dit is het eerste punt dat we zien: beschouw dit als de start
+            shipMap[log_id] = {
+                name: properties.ship_name,
+                log_id: log_id,
+                
+                // De vroegste logboekdatum gevonden
+                startDate: currentDate, 
+                
+                // De algemene reisstart (indien beschikbaar in properties)
+                voyageStart: properties.voyage_start || currentDate,
+                
+                startCoordinates: coordinates 
+            };
+        } else {
+            // Als we een eerdere datum vinden, updaten we de startgegevens
+            if (new Date(currentDate) < new Date(shipMap[log_id].startDate)) {
+                 shipMap[log_id].startDate = currentDate;
+                 shipMap[log_id].startCoordinates = coordinates;
+            }
+        }
+    });
+
+    // 2. Converteer de Map van unieke schepen naar een array
+    // Sorteer op de gevonden vroegste logboekdatum (startDate)
+    return Object.values(shipMap).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+},
 
     addMapInteractivity() {
         this.map.on('click', 'ship-log-points', (e) => {
