@@ -9,25 +9,25 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 // API access token for Mapbox
 mapboxgl.accessToken =
-  "";
+  "pk.eyJ1Ijoic2FyYWFtZWxpYSIsImEiOiJjbWh2cmJ1eXowYjBjMmxzN3ltNm9iaG10In0.8RJ6ewgf0MR4vOWU5-WRQA";
 
 export default {
   props: ["modelValue"],
 
   data(){
     return{
-        geojsonUrl: "/shipslogs_dummy.geojson"
+        geojsonUrl: "http://10.7.0.176:5000/api/routes"
     };
   },
   computed: {
     displayPosition() {
       const log = this.selectedLog;
-      
+
       // Controleer of de log bestaat en de coördinaten numeriek zijn
       if (log && typeof log.longitude === 'number' && typeof log.latitude === 'number') {
         // Formatteer de coördinaten als string
         return `${log.longitude.toFixed(2)}, ${log.latitude.toFixed(2)}`;
-      } 
+      }
       // Fallback voor ongedefinieerde/null coördinaten
       return 'Niet geregistreerd (bijv. aan land/haven)';
     }
@@ -61,7 +61,7 @@ export default {
     this.map.remove();
     this.map = null;
   },
-  
+
   // watch for external changes to the modelValue prop and update the map accordingly
   watch: {
     modelValue(next) {
@@ -80,7 +80,7 @@ export default {
       }
     },
   },
-  
+
   methods: {
     getLocation() {
       return {
@@ -91,82 +91,112 @@ export default {
 
     async addGeoJsonLayer() {
       try {
-        // 1. Load data - API call to fetch GeoJSON
-        //const response = await fetch(this.geojsonUrl);
-        //if (!response.ok) {
-        //    throw new Error(`HTTP error! status: ${response.status}`);
-        //}
-        //const data = await response.json();
+        // 1. Load data - API call to fetch GeoJSON or API-structured JSON
+        const response = await fetch(this.geojsonUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
+        const apiData = await response.json();
 
-        //Convert data to Json!
-        const response = await fetch(this.geojsonUrl);// Using local dummy data path for now
-        const dataJson = await response.json();
+        // Convert API format into a GeoJSON FeatureCollection if necessary.
+        // Expected API example (single object or array of objects):
+        // { log_id, ship_name, coordinates: [{date, lat, lng, ...}, ...], ... }
+        let geojson;
+        if (apiData && apiData.type === 'FeatureCollection' && Array.isArray(apiData.features)) {
+          geojson = apiData;
+        } else {
+          const records = Array.isArray(apiData) ? apiData : [apiData];
+          const features = [];
+          records.forEach(record => {
+            if (!record || !Array.isArray(record.coordinates)) return;
+            record.coordinates.forEach(coord => {
+              const lat = Number(coord.lat ?? coord.latitude ?? coord.latitud ?? 0);
+              const lng = Number(coord.lng ?? coord.longitude ?? coord.long ?? 0);
+              if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                features.push({
+                  type: 'Feature',
+                  geometry: { type: 'Point', coordinates: [lng, lat] },
+                  properties: {
+                    ship_name: record.ship_name || record.master || 'unknown',
+                    log_id: record.log_id || record.voyage_id || null,
+                    date: coord.date || coord.datetime || null,
+                    remarks: coord.remarks || null,
+                    weather: coord.weather || null,
+                    events: coord.events || [],
+                    destination: record.destination || null,
+                    master: record.master || null,
+                    voyage_start: record.voyage_start || null,
+                    voyage_end: record.voyage_end || null
+                  }
+                });
+              }
+            });
+          });
 
-        const data = dataJson; 
+          geojson = { type: 'FeatureCollection', features };
+        }
 
-        const routeLines = this.generateRoutes(data.features);
+        // Generate route lines from point features
+        const routeLines = this.generateRoutes(geojson.features);
 
-        // 2. Add Source 
-        this.map.addSource('ship-routes-source', {
-          type: 'geojson',
-          data: routeLines // GeoJSON FeatureCollection
-        });
-
-        // 3. Add layer
-        this.map.addLayer(
-        {
-            id: 'ship-routes-lines',
-            type: 'line',
-            source: 'ship-routes-source',
-            'minzoom': 2,
-            layout: {
-                'line-join': 'round',
-                'line-cap': 'round'
-            },
-            paint: {
-                'line-color': [
-                    'match',
-                    ['get', 'ship_name'],
-                    'Albion', '#A08060',      // Oud brons/bruin
-                    'De Zeefakkel', '#708090', // Oud staal/grijsblauw
-                    '#B0C4DE'                 // Licht staalblauw voor andere schepen
-                ],
-                
-                'line-width': 6, 
-                
-                'line-opacity': 0.9, 
-            
-                'line-dasharray': [3, 2], // [lengte van streep, lengte van spatie]
-            }
-        });
-        
-        this.map.addSource('ship-log-source', {
+        // Add or update ship-routes-source
+        if (this.map.getSource('ship-routes-source')) {
+          this.map.getSource('ship-routes-source').setData(routeLines);
+        } else {
+          this.map.addSource('ship-routes-source', {
             type: 'geojson',
-            data: data
-        });
+            data: routeLines
+          });
 
-    this.map.addLayer(
-        {
-          id: 'ship-log-points',
-          type: 'circle',
-          source: 'ship-log-source', // Reference to map source
-          paint: {
-            // Mapbox expression for style
-            'circle-color': [
-                'match',
-                ['get', 'ship_name'],
-                'De Zeefakkel', '#007bff',      // Blue
-                'De Walvisvaarder', '#dc3545', // Red
-                '#ccc'
-            ],
-            'circle-radius': 8,
-            'circle-stroke-width': 8,
-            'circle-stroke-color': '#fff'
+          // Add routes layer if not present
+          if (!this.map.getLayer('ship-routes-lines')) {
+            this.map.addLayer({
+              id: 'ship-routes-lines',
+              type: 'line',
+              source: 'ship-routes-source',
+              minzoom: 2,
+              layout: { 'line-join': 'round', 'line-cap': 'round' },
+              paint: {
+                'line-color': [
+                  'match', ['get', 'ship_name'],
+                  'Albion', '#A08060',
+                  'De Zeefakkel', '#708090',
+                  '#B0C4DE'
+                ],
+                'line-width': 6,
+                'line-opacity': 0.9,
+                'line-dasharray': [3, 2]
+              }
+            });
           }
-        },
-        
-    );
+        }
+
+        // Add or update ship-log-source (points)
+        if (this.map.getSource('ship-log-source')) {
+          this.map.getSource('ship-log-source').setData(geojson);
+        } else {
+          this.map.addSource('ship-log-source', { type: 'geojson', data: geojson });
+
+          if (!this.map.getLayer('ship-log-points')) {
+            this.map.addLayer({
+              id: 'ship-log-points',
+              type: 'circle',
+              source: 'ship-log-source',
+              paint: {
+                'circle-color': [
+                  'match', ['get', 'ship_name'],
+                  'De Zeefakkel', '#007bff',
+                  'De Walvisvaarder', '#dc3545',
+                  '#ccc'
+                ],
+                'circle-radius': 8,
+                'circle-stroke-width': 8,
+                'circle-stroke-color': '#fff'
+              }
+            });
+          }
+        }
 
         //Interactivtity: mousehovers and popups
         this.addMapInteractivity();
@@ -179,11 +209,11 @@ export default {
     addMapInteractivity() {
         this.map.on('click', 'ship-log-points', (e) => {
         const clickedFeature = e.features[0];
-        
+
         // ZEND HET EVENT UIT: 'open-sidebar' met de feature properties
         this.$emit('open-sidebar', {
             ...clickedFeature.properties,
-            longitude: clickedFeature.geometry.coordinates[0], 
+            longitude: clickedFeature.geometry.coordinates[0],
             latitude: clickedFeature.geometry.coordinates[1]
         });
 
@@ -194,7 +224,7 @@ export default {
             essential: true
         });
     });
-        
+
         // Change cursor at hover
         this.map.on('mouseenter', 'ship-log-points', () => {
             this.map.getCanvas().style.cursor = 'pointer';
@@ -226,7 +256,7 @@ export default {
         const coordinates = routes[log_id].map(f => f.geometry.coordinates);
 
         // 2. Maak de LineString Feature
-        if (coordinates.length > 1) { 
+        if (coordinates.length > 1) {
             // Vroegste en laatste datum (voor pop-ups op de lijn)
             const startDate = routes[log_id][0].properties.date;
             const endDate = routes[log_id][routes[log_id].length - 1].properties.date;
