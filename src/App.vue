@@ -3,11 +3,6 @@
     
     <div class="map-container">
       
-      <div id="overview-panel">
-        <p v-if="shipList.length > 0">Total {{ shipList.length }} ships found.</p>
-        <p v-else>Loading map...</p>
-      </div>
-
       <div id="info-sidebar" :class="{ 'open': sidebarOpen }">
         <button class="close-btn" @click="sidebarOpen = false">X</button>
   
@@ -47,23 +42,8 @@
         </div>
       </div>
       
-      <Map v-model="location" 
-           @open-sidebar="openSidebarWithData" 
-           @data-loaded="handleDataLoaded"
-           ref="mapComponent" />
 
-    </div>
-
-    <div v-show="showWelcomeScreen" id="welcome-screen-overlay"
-         :class="{ 'slide-out': welcomeClosing }">
-      <h1>⚓ Akira's Historical Logbooks</h1>
-      <p>Discover routes and ships of the 18th and 19th century</p>
-      
-      <button @click="startMapExploration">Start exploring</button>
-      
-    </div>
-
-    <MapView ref="mapRef" v-model="location" @open-sidebar="openSidebarWithData" @ships-loaded="onShipsLoaded" />
+      <MapView ref="mapRef" v-model="location" @open-sidebar="openSidebarWithData" @data-loaded="handleDataLoaded" @ships-loaded="onShipsLoaded" />
 
     <!-- Left menu for ships -->
     <div id="left-menu" :class="{ open: menuOpen }" @mouseenter="menuOpen = true" @mouseleave="menuOpen = false">
@@ -80,6 +60,19 @@
         <div v-else class="empty">No ships loaded</div>
       </div>
     </div>
+    </div>
+
+    <div v-show="showWelcomeScreen" id="welcome-screen-overlay"
+         :class="{ 'slide-out': welcomeClosing }"
+         @transitionend="onWelcomeTransitionEnd">
+      <h1>⚓ Akira's Historical Logbooks</h1>
+      <p>Discover routes and ships of the 18th and 19th century</p>
+      
+      <button @click="startMapExploration">Start exploring</button>
+      
+    </div>
+
+    
   </div>
 </template>
 
@@ -94,11 +87,8 @@ export default {
     return {
       // Map location object kept small for v-model binding
       // Statusvariabelen op root-niveau
-      showWelcomeScreen: true, 
+      showWelcomeScreen: true,
       welcomeClosing: false,
-      sidebarOpen: false,
-      selectedLog: null,
-      
       // Kaart parameters
       location: {
         center: { lng: -10.0, lat: 35.0 },
@@ -188,6 +178,26 @@ export default {
       const latDir = lat >= 0 ? 'N' : 'S';
       const lngDir = lng >= 0 ? 'E' : 'W';
       return `${Math.abs(lat).toFixed(2)}° ${latDir}, ${Math.abs(lng).toFixed(2)}° ${lngDir}`;
+    },
+    startMapExploration() {
+      // trigger CSS animation; overlay will be hidden in onWelcomeTransitionEnd
+      this.welcomeClosing = true;
+      // fallback in case transitionend doesn't fire (safety)
+      this._welcomeTimeout = setTimeout(() => {
+        if (this.welcomeClosing) {
+          this.showWelcomeScreen = false;
+          this.welcomeClosing = false;
+        }
+      }, 700); // slightly longer than CSS duration (600ms)
+    },
+
+    onWelcomeTransitionEnd(e) {
+      if (!this.welcomeClosing) return;
+      // ensure we only handle when the overlay is finishing its transition
+      // (multiple properties may fire; just guard with the flag)
+      clearTimeout(this._welcomeTimeout);
+      this.showWelcomeScreen = false;
+      this.welcomeClosing = false;
     }
   }
 };
@@ -221,7 +231,7 @@ export default {
   
   /* Styling en centrering */
   /* TRANSPARANTE ACHTERGROND: 70% dekkend perkament */
-  background-color: rgba(181, 170, 149, 0.882); 
+  background-color: rgba(149, 168, 181, 0.882); 
   color: #151e3c;
   display: flex;
   flex-direction: column;
@@ -275,12 +285,12 @@ export default {
   right: 0;
   width: 0; /* Standaard gesloten */
   height: 100%;
-  background-color: rgba(198, 211, 245, 0.766);
+  background-color: rgba(88, 91, 99, 0.918);
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   overflow-x: hidden;
   transition: 0.3s;
   z-index: 2; /* Zorg dat deze boven de kaart ligt */
-  color: #333;
+  color: #f0eeee;
 }
 
 #info-sidebar.open {
@@ -304,12 +314,12 @@ export default {
 }
 .meta {
   font-size: 13px;
-  color: #666;
+  color: #bcb9b9;
 }
 .badge {
   display: inline-block;
-  background: linear-gradient(180deg,#fff,#f0f0f0);
-  border: 1px solid #ddd;
+  background: linear-gradient(180deg,#7672a2,#1d144f);
+  border: 1px solid #202354;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 12px;
