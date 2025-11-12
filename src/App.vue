@@ -64,7 +64,7 @@
 
     <div v-show="showWelcomeScreen" id="welcome-screen-overlay"
          :class="{ 'slide-out': welcomeClosing }"
-         @transitionend="onWelcomeTransitionEnd">
+        @transitionend="onWelcomeTransitionEnd">
       <h1>⚓ Akira's Historical Logbooks</h1>
       <p>Discover routes and ships of the 18th and 19th century</p>
       
@@ -87,8 +87,11 @@ export default {
     return {
       // Map location object kept small for v-model binding
       // Statusvariabelen op root-niveau
-      showWelcomeScreen: true,
+      showWelcomeScreen: true, 
       welcomeClosing: false,
+      sidebarOpen: false,
+      selectedLog: null,
+      
       // Kaart parameters
       location: {
         center: { lng: -10.0, lat: 35.0 },
@@ -109,8 +112,18 @@ export default {
     }
   },
   methods: {
-  // NIEUWE METHODE: Wordt aangeroepen door MapComponent
-  openSidebarWithData(logProperties) {
+    onWelcomeTransitionEnd(e) {
+      // only handle the overlay's transition end
+      if (!this.welcomeClosing) return;
+      if (e.target && e.target.id !== 'welcome-screen-overlay') return;
+      clearTimeout(this._welcomeTimeout);
+      this.showWelcomeScreen = false;
+      this.welcomeClosing = false;
+    },
+    
+
+     // NIEUWE METHODE: Wordt aangeroepen door MapComponent
+     openSidebarWithData(logProperties) {
       // Ensure numeric coords if present
       if (logProperties) {
         const lng = Number(logProperties.longitude ?? logProperties.lng ?? logProperties.lon ?? logProperties.long);
@@ -180,24 +193,33 @@ export default {
       return `${Math.abs(lat).toFixed(2)}° ${latDir}, ${Math.abs(lng).toFixed(2)}° ${lngDir}`;
     },
     startMapExploration() {
-      // trigger CSS animation; overlay will be hidden in onWelcomeTransitionEnd
-      this.welcomeClosing = true;
-      // fallback in case transitionend doesn't fire (safety)
-      this._welcomeTimeout = setTimeout(() => {
-        if (this.welcomeClosing) {
+      if (this.welcomeClosing) return;
+      // ensure element is rendered, force reflow then toggle class to start transition
+      this.$nextTick(() => {
+        const el = document.getElementById('welcome-screen-overlay');
+        if (!el) {
           this.showWelcomeScreen = false;
-          this.welcomeClosing = false;
+          return;
         }
-      }, 700); // slightly longer than CSS duration (600ms)
+        void el.offsetWidth; // force reflow
+        requestAnimationFrame(() => {
+          this.welcomeClosing = true;
+          // fallback in case transitionend doesn't fire
+          this._welcomeTimeout = setTimeout(() => {
+            if (this.welcomeClosing) {
+              this.showWelcomeScreen = false;
+              this.welcomeClosing = false;
+            }
+          }, 750); // slightly longer than CSS duration (600ms)
+        });
+      });
     },
-
-    onWelcomeTransitionEnd(e) {
-      if (!this.welcomeClosing) return;
-      // ensure we only handle when the overlay is finishing its transition
-      // (multiple properties may fire; just guard with the flag)
-      clearTimeout(this._welcomeTimeout);
-      this.showWelcomeScreen = false;
-      this.welcomeClosing = false;
+    onWelcomeTransitionEnd() {
+      // This can be used to perform an action after the welcome screen transition ends
+      if (this.welcomeClosing) {
+        // For example, navigate to a different route or load data
+        // this.$router.push('/next-route');
+      }
     }
   }
 };
@@ -231,7 +253,7 @@ export default {
   
   /* Styling en centrering */
   /* TRANSPARANTE ACHTERGROND: 70% dekkend perkament */
-  background-color: rgba(149, 168, 181, 0.882); 
+  background-color: rgba(120, 127, 162, 0.882); 
   color: #151e3c;
   display: flex;
   flex-direction: column;

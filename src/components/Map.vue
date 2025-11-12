@@ -9,7 +9,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 // API access token for Mapbox
 mapboxgl.accessToken =
-  "pk.eyJ1Ijoic2FyYWFtZWxpYSIsImEiOiJjbWh2cmJ1eXowYjBjMmxzN3ltNm9iaG10In0.8RJ6ewgf0MR4vOWU5-WRQA";
+  "";
 
 export default {
   props: ["modelValue"],
