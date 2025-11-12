@@ -9,14 +9,14 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 // API access token for Mapbox
 mapboxgl.accessToken =
-  "";
+  "pk.eyJ1Ijoic2FyYWFtZWxpYSIsImEiOiJjbWh2cmJ1eXowYjBjMmxzN3ltNm9iaG10In0.8RJ6ewgf0MR4vOWU5-WRQA";
 
 export default {
   props: ["modelValue"],
 
   data(){
     return{
-        geojsonUrl: "http://10.7.0.176:5000/api/routes"
+      geojsonUrl: "http://10.7.0.176:5000/api/routes"
     };
   },
   computed: {
@@ -183,8 +183,8 @@ generateColorExpression(colorMap) {
         const routeLines = this.generateRoutes(geojson.features);
         let shipList = this.extractShipList(geojson.features);
         const colorMap = this.createColorMapping(shipList);
-const dynamicColorExpression = this.generateColorExpression(colorMap);
-this.$emit('data-loaded', shipList);
+        const dynamicColorExpression = this.generateColorExpression(colorMap);
+        this.$emit('data-loaded', shipList);
 
         // Build ships list with earliest (start) point per voyage/log
         const shipsMap = {};
@@ -231,6 +231,7 @@ this.$emit('data-loaded', shipList);
 
           // Add routes layer if not present
           if (!this.map.getLayer('ship-routes-lines')) {
+            // 1. Lijnlaag (LineString)
             this.map.addLayer({
               id: 'ship-routes-lines',
               type: 'line',
@@ -244,6 +245,30 @@ this.$emit('data-loaded', shipList);
                 'line-dasharray': [1, 1.5]
               }
             });
+
+            // 2. Pijllaag (Symbol layer)
+            // Plaats symbolen langs de lijn om de richting aan te geven
+            this.map.addLayer({
+                id: 'ship-routes-arrows',
+                type: 'symbol',
+                source: 'ship-routes-source',
+                minzoom: 5, // Pijlen zijn het meest nuttig op hogere zoomniveaus
+                layout: {
+                    'symbol-placement': 'line', // Plaats het symbool langs de lijn
+                    'symbol-spacing': 120,      // Afstand tussen de pijlen in pixels
+                    'icon-image': 'triangle-15', // Gebruik een ingebouwd Mapbox-symbool (driehoek)
+                    'icon-allow-overlap': true,
+                    'icon-ignore-placement': true,
+                    // De 'symbol-placement: line' roteert de iconen automatisch. 
+                    // We voegen een kleine offset toe als de 'triangle-15' niet correct uitgelijnd is (vaak is 90 of -90 nodig).
+                    'icon-rotate': 0, // Start met 0 en pas aan indien nodig (0 is vaak al goed)
+                    'icon-rotation-alignment': 'map' 
+                },
+                paint: {
+                    'icon-color': dynamicColorExpression, // Kleur de pijlen dynamisch
+                    'icon-opacity': 0.8
+                }
+            }, 'ship-routes-lines'); // Zorg ervoor dat de pijlen boven de lijnen liggen
           }
         }
 
@@ -288,7 +313,7 @@ this.$emit('data-loaded', shipList);
         const properties = feature.properties;
         const coordinates = feature.geometry.coordinates;
         
-        // Gebruik voyage_id als unieke sleutel
+        // Gebruik log_id als unieke sleutel
         const log_id = properties.log_id; 
         
     
@@ -311,8 +336,8 @@ this.$emit('data-loaded', shipList);
         } else {
             // Als we een eerdere datum vinden, updaten we de startgegevens
             if (new Date(currentDate) < new Date(shipMap[log_id].startDate)) {
-                 shipMap[log_id].startDate = currentDate;
-                 shipMap[log_id].startCoordinates = coordinates;
+                   shipMap[log_id].startDate = currentDate;
+                   shipMap[log_id].startCoordinates = coordinates;
             }
         }
     });
