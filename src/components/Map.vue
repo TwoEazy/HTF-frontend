@@ -244,7 +244,6 @@ this.$emit('data-loaded', shipList);
     },
 
     extractShipList(features) {
-        console.log(features);
     const shipMap = {};
 
     // 1. Groepeer Features en bepaal de vroegste logboekdatum
